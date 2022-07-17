@@ -1,0 +1,22 @@
+.HomePage__Grid {
+	display: grid;
+	grid-template-rows: 1fr 12fr 1fr;
+	grid-template-areas:
+		'navBar'
+		'gameBoard'
+		'controller';
+	width: 100%;
+	height: 100vh;
+}
+
+.HomePage__NavBarGrid {
+	grid-area: navBar;
+}
+
+.HomePage__GameBoard {
+	grid-area: gameBoard;
+}
+
+.HomePage__Controller {
+	grid-area: controller;
+}
