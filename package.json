@@ -1,8 +1,9 @@
 {
-  "name": "react_boilerplate",
+  "name": "game_of_life",
   "version": "1.0.0",
   "description": "React boilerplate that supports typescript",
   "main": "index.js",
+  "homepage": "https://sher208.github.io/game_of_life",
   "scripts": {
     "start": "webpack serve --config webpack/webpack.config.js --env env=dev",
     "build": "webpack --config webpack/webpack.config.js --env env=prod",
