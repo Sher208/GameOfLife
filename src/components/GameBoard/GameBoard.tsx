@@ -97,6 +97,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	//TODO: Work on this feature
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const onSaveSelection = (
 		_event: React.MouseEvent<HTMLDivElement, MouseEvent>,
 		i: number,
@@ -148,10 +150,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
 					rows.map((col, j) => (
 						<div
 							key={`${i}_${j}`}
-							onMouseDown={(event) =>
-								onSaveSelection(event, i, j)
-							}
-							onMouseUp={(event) => onSaveSelection(event, i, j)}
+							// onMouseDown={(event) =>
+							// 	onSaveSelection(event, i, j)
+							// }
+							// onMouseUp={(event) => onSaveSelection(event, i, j)}
 							onClick={() =>
 								setGrid((grid) =>
 									produceFunc(grid, (gridCopy) => {

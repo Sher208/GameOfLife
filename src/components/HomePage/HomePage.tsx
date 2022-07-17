@@ -13,8 +13,8 @@ const HomePage: React.FC = () => {
 			<NavBar className={styles.HomePage__NavBarGrid} />
 			<GameBoard
 				className={styles.HomePage__GameBoard}
-				rowNum={20}
-				columnNum={20}
+				rowNum={50}
+				columnNum={100}
 				currentState={value}
 				nextValueState={nextValue}
 			/>
