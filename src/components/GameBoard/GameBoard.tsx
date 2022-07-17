@@ -1,46 +1,45 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import styles from './GameBoard.module.scss';
 import { ControllerState } from '../Controller/Contoller';
+import { OPERATIONS, getGridColorScheme } from './GameBoardConstants';
+import { checkIfArraysAreEqual, createGrid } from '../utils';
 import produceFunc from 'immer';
-
-const OPERATIONS = [
-	[0, 1],
-	[0, -1],
-	[1, -1],
-	[-1, 1],
-	[1, 1],
-	[-1, -1],
-	[1, 0],
-	[-1, 0]
-];
 
 type GameBoardProps = {
 	rowNum?: number;
 	columnNum?: number;
 	className?: string;
 	currentState: number;
+	nextValueState?: number;
 };
 
-const getGrid = (rowNum: number, columnNum: number) => {
-	const rows = [];
-	for (let i = 0; i < rowNum; i++)
-		rows.push(Array.from(Array(columnNum), () => 0));
-	return rows;
-};
-
-const GameBoard = ({
+const GameBoard: React.FC<GameBoardProps> = ({
 	rowNum = 10,
 	columnNum = 10,
-	currentState = ControllerState.STOP
-}: GameBoardProps) => {
-	const [grid, setGrid] = useState(() => getGrid(rowNum, columnNum));
+	currentState = ControllerState.STOP,
+	nextValueState = 0
+}) => {
+	const [grid, setGrid] = useState(() => createGrid(rowNum, columnNum));
+
 	const currentStateRef = useRef(currentState);
-	currentStateRef.current = currentState;
+	const gridToSave = useRef<any>({
+		gridFilled: false,
+		mouseUp: {
+			currentXCoords: null,
+			currentXGridCoords: null
+		},
+		mouseDown: {
+			currentYCoords: null,
+			currentYGridCoords: null
+		}
+	});
 
 	useEffect(() => {
-		currentStateRef.current = ControllerState.PLAY;
-		console.log(currentState);
-		if (ControllerState.PLAY === currentState) {
+		currentStateRef.current = currentState;
+		if (
+			ControllerState.PLAY === currentState ||
+			ControllerState.SKIPNEXT === currentState
+		) {
 			getNextCellularState();
 		} else if (ControllerState.RESET === currentState) {
 			setGrid((grid) =>
@@ -54,21 +53,24 @@ const GameBoard = ({
 			);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentState]);
+	}, [currentState, nextValueState]);
 
 	const getNextCellularState = useCallback(() => {
-		if (currentStateRef.current != 1) {
+		if (
+			currentStateRef.current === ControllerState.STOP ||
+			currentStateRef.current === ControllerState.RESET
+		) {
 			return;
 		}
 
 		setGrid((g) => {
 			return produceFunc(g, (gridCopy) => {
 				for (let i = 0; i < rowNum; i++) {
-					for (let k = 0; k < columnNum; k++) {
+					for (let j = 0; j < columnNum; j++) {
 						let neighbors = 0;
 						OPERATIONS.forEach(([x, y]) => {
 							const newI = i + x;
-							const newK = k + y;
+							const newK = j + y;
 							if (
 								newI >= 0 &&
 								newI < rowNum &&
@@ -80,17 +82,59 @@ const GameBoard = ({
 						});
 
 						if (neighbors < 2 || neighbors > 3) {
-							gridCopy[i][k] = 0;
-						} else if (g[i][k] === 0 && neighbors === 3) {
-							gridCopy[i][k] = 1;
+							gridCopy[i][j] = 0;
+						} else if (g[i][j] === 0 && neighbors === 3) {
+							gridCopy[i][j] = 1;
 						}
 					}
 				}
 			});
 		});
-		setTimeout(getNextCellularState, 500);
+
+		if (currentStateRef.current === ControllerState.PLAY) {
+			setTimeout(getNextCellularState, 100);
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+
+	const onSaveSelection = (
+		_event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		i: number,
+		j: number
+	) => {
+		const gridToSaveCopy = { ...gridToSave.current };
+		if (_event.type === 'mouseup') {
+			gridToSaveCopy.mouseUp.currentXGridCoords = [i, j];
+		} else if (_event.type === 'mousedown') {
+			gridToSaveCopy.mouseDown.currentYGridCoords = [i, j];
+		}
+		if (
+			gridToSaveCopy.mouseUp.currentXGridCoords &&
+			gridToSaveCopy.mouseDown.currentYGridCoords &&
+			!checkIfArraysAreEqual(
+				gridToSaveCopy.mouseUp.currentXGridCoords,
+				gridToSaveCopy.mouseDown.currentYGridCoords
+			)
+		) {
+			const [firstRow, firstColumn] =
+				gridToSaveCopy.mouseUp.currentXGridCoords;
+			const [secondRow, secondColumn] =
+				gridToSaveCopy.mouseDown.currentYGridCoords;
+			setGrid((grid) =>
+				produceFunc(grid, (gridCopy) => {
+					for (let i = firstRow; i < secondRow; i++) {
+						for (let j = firstColumn; j < secondColumn; j++) {
+							if (gridCopy[i][j] !== 1) {
+								gridCopy[i][j] = 2;
+							}
+						}
+					}
+				})
+			);
+			gridToSaveCopy.gridFilled = true;
+		}
+		gridToSave.current = gridToSaveCopy;
+	};
 
 	return (
 		<div className={styles.GameBoard__Container}>
@@ -104,10 +148,15 @@ const GameBoard = ({
 					rows.map((col, j) => (
 						<div
 							key={`${i}_${j}`}
+							onMouseDown={(event) =>
+								onSaveSelection(event, i, j)
+							}
+							onMouseUp={(event) => onSaveSelection(event, i, j)}
 							onClick={() =>
 								setGrid((grid) =>
 									produceFunc(grid, (gridCopy) => {
-										gridCopy[i][j] = 1 - gridCopy[i][j];
+										gridCopy[i][j] =
+											gridCopy[i][j] === 1 ? 0 : 1;
 									})
 								)
 							}
@@ -115,9 +164,7 @@ const GameBoard = ({
 							style={{
 								width: 20,
 								height: 20,
-								backgroundColor: grid[i][j]
-									? '#ffb703'
-									: undefined,
+								backgroundColor: getGridColorScheme(grid[i][j]),
 								border: 'solid 1px #003566'
 							}}
 						/>
