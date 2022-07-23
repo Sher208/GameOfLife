@@ -25,9 +25,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 	gridBorderWidth = 1
 }) => {
 	const [grid, setGrid] = useState(() => createGrid(rowNum, columnNum));
-	const [value, setValue] = useState<CONTROLLER_STATE>(
-		CONTROLLER_STATE.SNIPPET_SELECTION
-	);
+	const [value, setValue] = useState<CONTROLLER_STATE>(CONTROLLER_STATE.STOP);
 	const [nextValue, setNextValue] = useState<number>(0);
 
 	const currentStateRef = useRef(value);
