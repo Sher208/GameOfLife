@@ -10,7 +10,7 @@ type NavBarProps = {
 
 const NavBar: React.FC<NavBarProps> = () => {
 	return (
-		<Box sx={{ flexGrow: 1 }}>
+		<Box sx={{ flexGrow: 1, width: '100%', height: '60px' }}>
 			<AppBar
 				position="static"
 				sx={{

@@ -1,27 +1,16 @@
+.GameBoard__Wrapper {
+	display: grid;
+	grid-template-rows: 11fr 1fr;
+	grid-template-areas:
+		'gameBoardContainer'
+		'gameBoardController';
+	height: calc(100vh - 60px);
+}
+
 .GameBoard__Container {
-	position: relative;
-	background-color: #e4e8ea;
-	border: 2px solid #023047;
-	overflow: scroll;
-	scroll-behavior: smooth;
+	grid-area: gameBoardContainer;
+}
 
-	&::-webkit-scrollbar {
-		width: 4px;
-		height: 4px;
-	}
-
-	&::-webkit-scrollbar-track {
-		border-radius: 2px;
-		box-shadow: inset 0 0 6px #000814;
-		-webkit-box-shadow: inset 0 0 6px #000814;
-	}
-
-	&::-webkit-scrollbar-thumb {
-		border-radius: 2px;
-		background-color: #ffd60a;
-	}
-
-	//   &::-webkit-scrollbar-track:vertical {
-	//     width: 4px;
-	//   }
+.GameBoard__Controller {
+	grid-area: gameBoardController;
 }

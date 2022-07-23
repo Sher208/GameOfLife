@@ -1,28 +1,22 @@
-import React, { useState } from 'react';
-import Controller, { ControllerState } from '../Controller/Contoller';
+import React from 'react';
 import GameBoard from '../GameBoard/GameBoard';
 import NavBar from '../NavBar/NavBar';
 import styles from './HomePage.module.scss';
 
 const HomePage: React.FC = () => {
-	const [value, setValue] = useState<ControllerState>(ControllerState.STOP);
-	const [nextValue, setNextValue] = useState<number>(0);
-
+	const ROW_NUMBER = 50;
+	const COLUMN_NUMBER = 100;
+	const GRID_WIDTH = 20;
+	const GRID_BOREDER_WIDTH = 1;
 	return (
 		<div className={styles.HomePage__Grid}>
 			<NavBar className={styles.HomePage__NavBarGrid} />
 			<GameBoard
 				className={styles.HomePage__GameBoard}
-				rowNum={50}
-				columnNum={100}
-				currentState={value}
-				nextValueState={nextValue}
-			/>
-			<Controller
-				className={styles.HomePage__Controller}
-				value={value}
-				onChange={setValue}
-				onNextClick={setNextValue}
+				rowNum={ROW_NUMBER}
+				columnNum={COLUMN_NUMBER}
+				gridWidth={GRID_WIDTH}
+				gridBorderWidth={GRID_BOREDER_WIDTH}
 			/>
 		</div>
 	);
