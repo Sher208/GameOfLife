@@ -41,7 +41,11 @@ module.exports = {
 		new CleanWebpackPlugin(), // Cleans the previous build
 		new HtmlWebpackPlugin({
 			inject: true,
-			favicon: path.resolve(__dirname, '..', './public/favicon.ico'),
+			favicon: path.resolve(
+				__dirname,
+				'..',
+				'./public/favicons/favicon.ico'
+			),
 			template: path.resolve(__dirname, '..', './public/index.html')
 		})
 	],
