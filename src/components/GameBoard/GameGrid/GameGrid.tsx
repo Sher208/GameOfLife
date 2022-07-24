@@ -11,6 +11,7 @@ type GameGrid = {
 	gridBorderWidth?: number;
 	grid: number[][];
 	controllerValue: CONTROLLER_STATE;
+	onDragDrop?: (...args: any) => void;
 	onGridClick: (...args: any) => void;
 	onGridSelected?: (
 		rectangle: RectangleCoords,
@@ -36,6 +37,7 @@ const GameGrid: React.FC<GameGrid> = ({
 	gridWidth = 20,
 	gridBorderWidth = 1,
 	grid,
+	onDragDrop = () => {},
 	onGridClick,
 	onGridSelected = () => {},
 	controllerValue
@@ -114,6 +116,17 @@ const GameGrid: React.FC<GameGrid> = ({
 		onGridSelected(rect, MOUSE_EVENTS.UP);
 	};
 
+	const onDrop = (
+		_event: React.DragEvent<HTMLDivElement>,
+		i: number,
+		j: number
+	) => {
+		const getGrid: string = _event?.dataTransfer?.getData('savedState');
+		if (getGrid) {
+			onDragDrop(JSON.parse(getGrid), i, j);
+		}
+	};
+
 	return (
 		<div className={styles.GameGrid__Wrapper}>
 			<div
@@ -138,6 +151,8 @@ const GameGrid: React.FC<GameGrid> = ({
 								enableSnippetSelectionEvent &&
 								onMouseUp(event, i, j)
 							}
+							onDragOver={(e) => e.preventDefault()}
+							onDrop={(e) => onDrop(e, i, j)}
 							onClick={(event) => onGridClick(event, i, j)}
 							aria-hidden="true"
 							style={{

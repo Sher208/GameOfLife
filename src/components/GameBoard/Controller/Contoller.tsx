@@ -41,8 +41,7 @@ const Controller: React.FC<ControllerProps> = ({
 			showLabels
 			value={value}
 			sx={{
-				height: '100%',
-				bgColor: '#f1faee',
+				backgroundColor: '#f9f4f4',
 				transition: 'none',
 				'& .MuiSvgIcon-root': {
 					color: '#ffd60a'
