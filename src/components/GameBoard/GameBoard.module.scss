@@ -1,10 +1,23 @@
 .GameBoard__Wrapper {
+	position: relative;
+	margin-top: 56px;
 	display: grid;
-	grid-template-rows: 11fr 1fr;
+	grid-template-rows: 11fr 60px;
 	grid-template-areas:
 		'gameBoardContainer'
 		'gameBoardController';
-	height: calc(100vh - 60px);
+	height: calc(100vh - 56px);
+
+	& > .GameBoard__SideBarController {
+		background-color: aquamarine;
+		top: 0;
+		right: 0;
+		height: calc(100vh - 130px);
+		width: 60px;
+		position: absolute;
+		display: flex;
+		flex-direction: row;
+	}
 }
 
 .GameBoard__Container {

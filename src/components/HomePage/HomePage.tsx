@@ -1,6 +1,6 @@
 import React from 'react';
 import GameBoard from '../GameBoard/GameBoard';
-import NavBar from '../NavBar/NavBar';
+import SaveDrawer from '../SaveDrawer/SaveDrawer';
 import styles from './HomePage.module.scss';
 
 const HomePage: React.FC = () => {
@@ -10,7 +10,7 @@ const HomePage: React.FC = () => {
 	const GRID_BOREDER_WIDTH = 1;
 	return (
 		<div className={styles.HomePage__Grid}>
-			<NavBar className={styles.HomePage__NavBarGrid} />
+			<SaveDrawer className={styles.HomePage__NavBarGrid} />
 			<GameBoard
 				className={styles.HomePage__GameBoard}
 				rowNum={ROW_NUMBER}

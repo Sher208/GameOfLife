@@ -9,6 +9,8 @@ import {
 import { createGrid } from '../utils';
 import produceFunc from 'immer';
 import GameGrid, { MOUSE_EVENTS, RectangleCoords } from './GameGrid/GameGrid';
+import { SavedCellularState } from '../SaveDrawer/SaveDrawer';
+// import SideBarController from './SideBarController/SideBarController';
 
 type GameBoardProps = {
 	rowNum?: number;
@@ -29,6 +31,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 	const [nextValue, setNextValue] = useState<number>(0);
 
 	const currentStateRef = useRef(value);
+	const timerRef = useRef<number | undefined>(undefined);
 	currentStateRef.current = value;
 
 	useEffect(() => {
@@ -73,6 +76,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 			currentStateRef.current === CONTROLLER_STATE.STOP ||
 			currentStateRef.current === CONTROLLER_STATE.RESET
 		) {
+			clearTimeout(timerRef.current);
 			return;
 		}
 
@@ -113,12 +117,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
 		});
 
 		if (currentStateRef.current === CONTROLLER_STATE.PLAY) {
-			setTimeout(getNextCellularState, 50);
+			timerRef.current = window.setTimeout(getNextCellularState, 50);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	//TODO: Work on this feature
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const onSaveSelection = (
 		rectangle: RectangleCoords,
@@ -185,6 +188,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 	const onSaveClick = () => {
 		const selectedArray = generateRectangleSnippet(grid);
 		if (selectedArray) {
+			console.log(selectedArray);
 			const convertToCsvValue: string = convertToCSV(selectedArray);
 			const element = document.createElement('a');
 			const textFile = new Blob([convertToCsvValue], {
@@ -197,6 +201,52 @@ const GameBoard: React.FC<GameBoardProps> = ({
 		}
 	};
 
+	const onDragDrop = (
+		selectedCellularState: SavedCellularState,
+		i: number,
+		j: number
+	) => {
+		const gridInfo: number[][] = selectedCellularState.gridData;
+		const getGridCenterCoords = [
+			Math.ceil(gridInfo.length / 2),
+			Math.ceil(gridInfo[0].length / 2)
+		];
+
+		console.log(gridInfo, getGridCenterCoords, i, j);
+
+		setGrid((grid) =>
+			produceFunc(grid, (gridCopy) => {
+				let currI = 0;
+				let currJ = 0;
+				for (
+					let x = i - getGridCenterCoords[0];
+					x < i + getGridCenterCoords[0] + 1;
+					x++
+				) {
+					currJ = 0;
+					for (
+						let y = j - getGridCenterCoords[1];
+						y < j + getGridCenterCoords[1] + 1;
+						y++
+					) {
+						if (
+							x >= 0 &&
+							x < rowNum &&
+							y >= 0 &&
+							y < columnNum &&
+							gridInfo.length > currI &&
+							gridInfo[0].length > currJ
+						) {
+							gridCopy[x][y] = gridInfo[currI][currJ];
+							currJ = currJ + 1;
+						}
+					}
+					currI = currI + 1;
+				}
+			})
+		);
+	};
+
 	return (
 		<div className={styles.GameBoard__Wrapper}>
 			<GameGrid
@@ -206,9 +256,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
 				gridBorderWidth={gridBorderWidth}
 				grid={grid}
 				controllerValue={value}
+				onDragDrop={onDragDrop}
 				onGridClick={onGridClick}
 				onGridSelected={onSaveSelection}
 			/>
+			{/* <SideBarController
+				className={styles.GameBoard__SideBarController}
+			/> */}
 			<Controller
 				className={styles.GameBoard__Controller}
 				value={value}

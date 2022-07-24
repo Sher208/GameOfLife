@@ -5,10 +5,10 @@ import {
 	StopCircle,
 	Replay,
 	SkipNext,
-	Clear,
-	TextSnippet,
-	LayersClear,
-	Save
+	LayersClear
+	// Clear,
+	// TextSnippet,
+	// Save
 } from '@mui/icons-material';
 
 type ControllerProps = {
@@ -33,16 +33,15 @@ export enum CONTROLLER_STATE {
 const Controller: React.FC<ControllerProps> = ({
 	value,
 	onChange,
-	onNextClick,
-	onSaveClick
+	onNextClick
+	// onSaveClick
 }) => {
 	return (
 		<BottomNavigation
 			showLabels
 			value={value}
 			sx={{
-				height: '100%',
-				bgColor: '#f1faee',
+				backgroundColor: '#f9f4f4',
 				transition: 'none',
 				'& .MuiSvgIcon-root': {
 					color: '#ffd60a'
@@ -65,6 +64,12 @@ const Controller: React.FC<ControllerProps> = ({
 			onChange={(event, newValue) => onChange(newValue)}
 		>
 			<BottomNavigationAction
+				label="Erase"
+				value={CONTROLLER_STATE.ERASER}
+				style={{ color: '#03045e' }}
+				icon={<LayersClear />}
+			/>
+			<BottomNavigationAction
 				label="Play"
 				value={CONTROLLER_STATE.PLAY}
 				style={{ color: '#03045e' }}
@@ -75,12 +80,6 @@ const Controller: React.FC<ControllerProps> = ({
 				value={CONTROLLER_STATE.STOP}
 				style={{ color: '#03045e' }}
 				icon={<StopCircle />}
-			/>
-			<BottomNavigationAction
-				label="Erase"
-				value={CONTROLLER_STATE.ERASER}
-				style={{ color: '#03045e' }}
-				icon={<LayersClear />}
 			/>
 			<BottomNavigationAction
 				label="Next"
@@ -95,7 +94,7 @@ const Controller: React.FC<ControllerProps> = ({
 				style={{ color: '#03045e' }}
 				icon={<Replay />}
 			/>
-			<BottomNavigationAction
+			{/* <BottomNavigationAction
 				label="Snippet Selection"
 				value={CONTROLLER_STATE.SNIPPET_SELECTION}
 				style={{ color: '#03045e' }}
@@ -113,7 +112,7 @@ const Controller: React.FC<ControllerProps> = ({
 				value={CONTROLLER_STATE.SAVE}
 				style={{ color: '#03045e' }}
 				icon={<Save />}
-			/>
+			/> */}
 		</BottomNavigation>
 	);
 };
