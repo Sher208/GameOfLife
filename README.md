@@ -4,7 +4,6 @@ The Game of Life, also known simply as Life, is a cellular automaton devised by 
 [![Wikipedia](https://img.shields.io/badge/Wikipedia-%23000000.svg?style=for-the-badge&logo=wikipedia&logoColor=white)](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 
 ## Currently Available Features
-----
 
 - Few Popular options to select from in the collapsible bar (more to be added in the future...)
 
@@ -27,7 +26,6 @@ The Game of Life, also known simply as Life, is a cellular automaton devised by 
 
 
 ## Features to Be Excited About
------
 | Feature   | Description                       |
 | :-------- | :-------------------------------- |
 | `Snippet Selection`    | Ability to highlight a part of snippet and apply save them |
