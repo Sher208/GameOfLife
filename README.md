@@ -13,7 +13,9 @@ The Game of Life, also known simply as Life, is a cellular automaton devised by 
 </p>
 
 - Select Pre-made cellular state by **drag and drop** to apply them on to the grid.
-![working](./docs/gif/selectionFeature.gif)
+<p align="center">
+  <img src="./docs/gif/selectionFeature.gif">
+</p>
 
 
 | Feature   | Description                       |
