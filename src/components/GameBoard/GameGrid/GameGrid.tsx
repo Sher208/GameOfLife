@@ -1,7 +1,7 @@
 import React, { useRef, useCallback } from 'react';
-import { CONTROLLER_STATE } from '../Controller/Contoller';
+import { CONTROLLER_STATE } from '../Controller/Controls';
 import { getGridColorScheme } from '../GameBoardConstants';
-import styles from './GameGrid.module.scss';
+import styled from 'styled-components';
 
 type GameGrid = {
 	className?: string;
@@ -11,12 +11,7 @@ type GameGrid = {
 	gridBorderWidth?: number;
 	grid: number[][];
 	controllerValue: CONTROLLER_STATE;
-	onDragDrop?: (...args: any) => void;
-	onGridClick: (...args: any) => void;
-	onGridSelected?: (
-		rectangle: RectangleCoords,
-		mouseEvent: MOUSE_EVENTS
-	) => void;
+	handleGridDispatch: (...args: any) => void;
 };
 
 export type RectangleCoords = {
@@ -26,21 +21,46 @@ export type RectangleCoords = {
 	h: number;
 };
 
-export enum MOUSE_EVENTS {
-	UP,
-	DOWN,
-	MOVE
+export enum MOUSE_EVENTS_STATE {
+	UP = 'MOUSE_EVENTS_UP',
+	DOWN = 'MOUSE_EVENTS_DOWN',
+	MOVE = 'MOUSE_EVENTS_MOVE',
+	CLICK = 'MOUSE_EVENTS_CLICK',
+	DRAG = 'MOUSE_EVENTS_DRAG'
 }
 
+const StyledGameGrid = styled.div`
+	background-color: #eaeaea;
+	border: 2px solid #023047;
+	overflow: scroll;
+	scroll-behavior: smooth;
+	margin-left: 63px;
+
+	&::-webkit-scrollbar {
+		width: 4px;
+		height: 4px;
+	}
+
+	&::-webkit-scrollbar-track {
+		border-radius: 2px;
+		box-shadow: inset 0 0 6px #000814;
+		-webkit-box-shadow: inset 0 0 6px #000814;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 2px;
+		background-color: #ffd60a;
+	}
+`;
+
 const GameGrid: React.FC<GameGrid> = ({
+	rowNum = 10,
 	columnNum = 10,
 	gridWidth = 20,
 	gridBorderWidth = 1,
 	grid,
-	onDragDrop = () => {},
-	onGridClick,
-	onGridSelected = () => {},
-	controllerValue
+	controllerValue,
+	handleGridDispatch
 }) => {
 	const drawOnGrid = useRef<any>({
 		isDrag: false,
@@ -60,8 +80,11 @@ const GameGrid: React.FC<GameGrid> = ({
 		j: number
 	) => {
 		if (drawOnGrid.current.isDirty) {
-			const rect: RectangleCoords = { x: 0, y: 0, w: 0, h: 0 };
-			onGridSelected(rect, MOUSE_EVENTS.DOWN);
+			handleGridDispatch({
+				type: MOUSE_EVENTS_STATE.DOWN,
+				rowNum,
+				columnNum
+			});
 		}
 		drawOnGrid.current.isDrag = true;
 		drawOnGrid.current.curX = drawOnGrid.current.startX = i;
@@ -70,7 +93,7 @@ const GameGrid: React.FC<GameGrid> = ({
 
 	const updateCanvas = useCallback(() => {
 		if (drawOnGrid.current.isDrag) {
-			const rect: RectangleCoords = {
+			const rectangle: RectangleCoords = {
 				x: Math.min(drawOnGrid.current.startX, drawOnGrid.current.curX),
 				y: Math.min(drawOnGrid.current.startY, drawOnGrid.current.curY),
 				w: Math.abs(
@@ -78,7 +101,12 @@ const GameGrid: React.FC<GameGrid> = ({
 				),
 				h: Math.abs(drawOnGrid.current.curY - drawOnGrid.current.startY)
 			};
-			onGridSelected(rect, MOUSE_EVENTS.MOVE);
+			handleGridDispatch({
+				type: MOUSE_EVENTS_STATE.MOVE,
+				rowNum,
+				columnNum,
+				rectangle
+			});
 		}
 		drawOnGrid.current.isDirty = false;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,13 +135,18 @@ const GameGrid: React.FC<GameGrid> = ({
 		drawOnGrid.current.isDrag = false;
 		drawOnGrid.current.isDirty = true;
 
-		const rect: RectangleCoords = {
+		const rectangle: RectangleCoords = {
 			x: Math.min(drawOnGrid.current.startX, i),
 			y: Math.min(drawOnGrid.current.startY, j),
 			w: Math.abs(i - drawOnGrid.current.startX),
 			h: Math.abs(j - drawOnGrid.current.startY)
 		};
-		onGridSelected(rect, MOUSE_EVENTS.UP);
+		handleGridDispatch({
+			type: MOUSE_EVENTS_STATE.UP,
+			rowNum,
+			columnNum,
+			rectangle
+		});
 	};
 
 	const onDrop = (
@@ -123,12 +156,53 @@ const GameGrid: React.FC<GameGrid> = ({
 	) => {
 		const getGrid: string = _event?.dataTransfer?.getData('savedState');
 		if (getGrid) {
-			onDragDrop(JSON.parse(getGrid), i, j);
+			const getCelluarGrid: number[][] = JSON.parse(getGrid).gridData;
+			handleGridDispatch({
+				type: MOUSE_EVENTS_STATE.DRAG,
+				rowNum,
+				columnNum,
+				iIndex: i,
+				jIndex: j,
+				draggedGridInfo: getCelluarGrid
+			});
+		}
+	};
+
+	/**
+	 * @param _event React Mouse event
+	 * @param i Grid i index
+	 * @param j Grid j Index
+	 */
+	const onGridClick = (
+		_event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+		i: number,
+		j: number
+	) => {
+		if (CONTROLLER_STATE.SNIPPET_SELECTION === controllerValue) {
+			return;
+		}
+
+		if (CONTROLLER_STATE.ERASER === controllerValue) {
+			handleGridDispatch({
+				type: CONTROLLER_STATE.ERASER,
+				rowNum,
+				columnNum,
+				iIndex: i,
+				jIndex: j
+			});
+		} else {
+			handleGridDispatch({
+				type: MOUSE_EVENTS_STATE.CLICK,
+				rowNum,
+				columnNum,
+				iIndex: i,
+				jIndex: j
+			});
 		}
 	};
 
 	return (
-		<div className={styles.GameGrid__Wrapper}>
+		<StyledGameGrid>
 			<div
 				style={{
 					display: 'grid',
@@ -165,7 +239,7 @@ const GameGrid: React.FC<GameGrid> = ({
 					))
 				)}
 			</div>
-		</div>
+		</StyledGameGrid>
 	);
 };
 

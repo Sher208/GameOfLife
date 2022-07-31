@@ -15,7 +15,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import CircularIcon from './CircularIcon/CircularIcon';
-import { generateRgba } from '../utils';
+import { generateRgba } from '../../utils';
 import { preSetData } from './SaveDrawerConstant';
 
 const drawerWidth = 240;
