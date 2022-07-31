@@ -8,22 +8,28 @@
 		'gameBoardController';
 	height: calc(100vh - 56px);
 
-	& > .GameBoard__SideBarController {
-		background-color: aquamarine;
+	& > .GameBoard__SideController {
+		overflow: hidden;
+		z-index: 100;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
 		top: 0;
 		right: 0;
-		height: calc(100vh - 130px);
 		width: 60px;
 		position: absolute;
+	}
+
+	& > .GameBoard__Container {
+		grid-area: gameBoardContainer;
+	}
+
+	& > .GameBoard__BottomController {
+		grid-area: gameBoardController;
 		display: flex;
 		flex-direction: row;
+		justify-content: center;
+		align-items: center;
 	}
-}
-
-.GameBoard__Container {
-	grid-area: gameBoardContainer;
-}
-
-.GameBoard__Controller {
-	grid-area: gameBoardController;
 }
